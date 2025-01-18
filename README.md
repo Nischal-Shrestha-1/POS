@@ -22,3 +22,11 @@ Nischal Shrestha:
 3. Allowing the user to view the product as well as sort in ascending and descending in the table.
 4. Allowing the user to sell the product to the customers in the POS module.
 5. Allowing the user to sell the product to the customer in a bulk.
+
+Anny Ruth Mahato
+
+1. Allowing the user to add/edit/delete vendor details to the system.
+2. Allowing the user to buy products that have been listed from the vendors.
+3. Allowing the user to search the product in a search box.
+4. Allowing the user to view the products that have been bought from the vendors.
+5. Allowing the user to filter the purchase list by Serial Number or Vendor Name.
