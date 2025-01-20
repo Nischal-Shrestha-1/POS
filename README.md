@@ -19,7 +19,7 @@ Project Source: Database -> https://info-6134-pos-project-default-rtdb.firebasei
 
 Data Source: Multi-user input
 
-## App Features:`
+## App Features:
 
 Nischal Shrestha:
 
