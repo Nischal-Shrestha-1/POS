@@ -1,4 +1,5 @@
 ## Group ID:
+
 Section 25W Group 3
 
 ## Group Member List:
@@ -11,9 +12,11 @@ Section 25W Group 3
 ## Project Details:
 
 Project Name: BigMart POS
+
 Project Description: This project will act as a smiple e-commerce website for grocery shopping and a POS system will also be integrated to it. The user will be able to buy goods from the vendor and sell it to the customers.
 
 Project Source: Database -> https://info-6134-pos-project-default-rtdb.firebaseio.com/
+
 Data Source: Multi-user input
 
 ## App Features:`
