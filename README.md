@@ -31,3 +31,11 @@ Anny Ruth Mahato
 3. Allowing the user to search the product in a search box.
 4. Allowing the user to view the products that have been bought from the vendors.
 5. Allowing the user to filter the purchase list by Serial Number or Vendor Name.
+
+Vive Kumar Gurung
+
+1. Allowing user to view daily stats in the dashboard.
+2. Allowing user to create/edit/delete location or branches for the company.
+3. Allowing user to select their current branch in the settings tab.
+4. Allowing user to navigate to different pages using navitation bar.
+5. Allowing user to view and sort locations details in a table view.
