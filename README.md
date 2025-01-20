@@ -1,3 +1,4 @@
+## Group ID:
 Section 25W Group 3
 
 ## Group Member List:
@@ -5,8 +6,9 @@ Section 25W Group 3
 1. Nischal Shrestha
 2. Anny Ruth Mahato
 3. Vivek Kumar Gurung
+4. Aniket Ramdam
 
-## Project Details
+## Project Details:
 
 Project Name: BigMart POS
 Project Description: This project will act as a smiple e-commerce website for grocery shopping and a POS system will also be integrated to it. The user will be able to buy goods from the vendor and sell it to the customers.
@@ -14,7 +16,7 @@ Project Description: This project will act as a smiple e-commerce website for gr
 Project Source: Database -> https://info-6134-pos-project-default-rtdb.firebaseio.com/
 Data Source: Multi-user input
 
-## App Features
+## App Features:`
 
 Nischal Shrestha:
 
@@ -39,3 +41,11 @@ Vive Kumar Gurung
 3. Allowing user to select their current branch in the settings tab.
 4. Allowing user to navigate to different pages using navitation bar.
 5. Allowing user to view and sort locations details in a table view.
+
+Aniket Ramdam
+
+1. Allowing the user to add/edit/delete customer details.
+2. Allowing the user to view and filter the customer table data.
+3. Allowing the user to sell the product to the customer without using the POS system.
+4. Allowing the user to view and filter the sold product details in table view.
+5. Allowing the user to update the sold product if needed.
