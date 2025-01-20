@@ -4,6 +4,7 @@ Section 25W Group 3
 
 1. Nischal Shrestha
 2. Anny Ruth Mahato
+3. Vivek Kumar Gurung
 
 ## Project Details
 
