@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { View, TextInput, Button, StyleSheet, Alert } from "react-native";
+import { View, Alert, StyleSheet } from "react-native";
+import { TextInput, Button, Text } from "react-native-paper";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../config/firebaseConfig";
 
@@ -10,46 +11,70 @@ const SignupScreen = ({ navigation }) => {
   const handleSignup = async () => {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      navigation.replace("Tabs");
     } catch (error) {
       Alert.alert("Signup Error", error.message);
     }
   };
 
   return (
-    <View style={styles.screen}>
+    <View style={styles.container}>
+      <Text style={styles.header}>BigMart</Text>
       <TextInput
-        style={styles.input}
-        placeholder="Email"
+        label="Email"
         value={email}
         onChangeText={setEmail}
+        style={styles.input}
+        mode="outlined"
+        keyboardType="email-address"
+        autoCapitalize="none"
       />
       <TextInput
-        style={styles.input}
-        placeholder="Password"
-        secureTextEntry
+        label="Password"
         value={password}
         onChangeText={setPassword}
+        style={styles.input}
+        mode="outlined"
+        secureTextEntry
       />
-      <Button title="Sign Up" onPress={handleSignup} />
+      <Button mode="contained" onPress={handleSignup} style={styles.button}>
+        Sign Up
+      </Button>
+      <Text style={styles.footerText}>
+        Already have an account?{" "}
+        <Text style={styles.link} onPress={() => navigation.navigate("Login")}>
+          Log in
+        </Text>
+      </Text>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  screen: {
+  container: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     padding: 16,
   },
+  header: {
+    fontSize: 36,
+    fontWeight: "bold",
+    marginBottom: 30,
+  },
   input: {
-    height: 40,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    marginBottom: 10,
     width: "100%",
-    paddingHorizontal: 10,
+    marginBottom: 16,
+  },
+  button: {
+    width: "100%",
+  },
+  footerText: {
+    marginTop: 16,
+    textAlign: "center",
+  },
+  link: {
+    color: "#1e90ff",
+    textDecorationLine: "underline",
   },
 });
 

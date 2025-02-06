@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { View, TextInput, Button, StyleSheet, Alert } from "react-native";
+import { View, Alert, StyleSheet, Text } from "react-native";
+import { TextInput, Button } from "react-native-paper";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../config/firebaseConfig";
 
@@ -10,47 +11,70 @@ const LoginScreen = ({ navigation }) => {
   const handleLogin = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigation.replace("Tabs");
     } catch (error) {
       Alert.alert("Login Error", error.message);
     }
   };
 
   return (
-    <View style={styles.screen}>
+    <View style={styles.container}>
+      <Text style={styles.header}>BigMart</Text>
       <TextInput
-        style={styles.input}
-        placeholder="Email"
+        label="Email"
         value={email}
         onChangeText={setEmail}
+        style={styles.input}
+        mode="outlined"
+        keyboardType="email-address"
+        autoCapitalize="none"
       />
       <TextInput
-        style={styles.input}
-        placeholder="Password"
-        secureTextEntry
+        label="Password"
         value={password}
         onChangeText={setPassword}
+        style={styles.input}
+        mode="outlined"
+        secureTextEntry
       />
-      <Button title="Login" onPress={handleLogin} />
-      <Button title="Sign Up" onPress={() => navigation.navigate("Signup")} />
+      <Button mode="contained" onPress={handleLogin} style={styles.button}>
+        Login
+      </Button>
+      <Text style={styles.footerText}>
+        Don't have an account?{" "}
+        <Text style={styles.link} onPress={() => navigation.navigate("Signup")}>
+          Sign up
+        </Text>
+      </Text>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  screen: {
+  container: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     padding: 16,
   },
+  header: {
+    fontSize: 36,
+    fontWeight: "bold",
+    marginBottom: 30,
+  },
   input: {
-    height: 40,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    marginBottom: 10,
     width: "100%",
-    paddingHorizontal: 10,
+    marginBottom: 16,
+  },
+  button: {
+    width: "100%",
+  },
+  footerText: {
+    marginTop: 16,
+    textAlign: "center",
+  },
+  link: {
+    color: "#1e90ff",
+    textDecorationLine: "underline",
   },
 });
 
