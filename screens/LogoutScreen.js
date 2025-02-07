@@ -1,17 +1,14 @@
 import React from "react";
 import { View, Button, StyleSheet } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 import { signOut } from "firebase/auth";
 import { auth } from "../config/firebaseConfig";
 import { Card, Title } from "react-native-paper";
 
 const LogoutScreen = () => {
-  const navigation = useNavigation();
 
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      navigation.replace("Login");
     } catch (error) {
       console.error("Logout Error:", error.message);
     }
