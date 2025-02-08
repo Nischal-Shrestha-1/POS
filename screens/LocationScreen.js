@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, Button, TouchableOpacity } from "react-native";
 import { DataTable } from "react-native-paper";
+import { MaterialCommunityIcons } from "react-native-vector-icons";
 import { ref, push, update, remove, onValue } from "firebase/database";
 import { database } from "../config/firebaseConfig";
 
@@ -8,6 +9,7 @@ const LocationScreen = () => {
   const [locations, setLocations] = useState([]);
   const [locationName, setLocationName] = useState("");
   const [editingId, setEditingId] = useState(null);
+  const [sortAscending, setSortAscending] = useState(true);
 
   useEffect(() => {
     const locationRef = ref(database, "locations");
@@ -46,6 +48,17 @@ const LocationScreen = () => {
     remove(ref(database, `locations/${id}`));
   };
 
+  const toggleSortOrder = () => {
+    setSortAscending(!sortAscending);
+    setLocations(
+      [...locations].sort((a, b) => {
+        return sortAscending
+          ? a.name.localeCompare(b.name)
+          : b.name.localeCompare(a.name);
+      })
+    );
+  };
+
   return (
     <View style={{ padding: 20 }}>
       <TextInput
@@ -60,7 +73,18 @@ const LocationScreen = () => {
       />
       <DataTable>
         <DataTable.Header>
-          <DataTable.Title>Location Name</DataTable.Title>
+          <TouchableOpacity
+            onPress={toggleSortOrder}
+            style={{ flexDirection: "row", alignItems: "center", flex: 1 }}
+          >
+            <DataTable.Title>Location Name</DataTable.Title>
+            <MaterialCommunityIcons
+              name={sortAscending ? "arrow-up" : "arrow-down"}
+              size={20}
+              color={sortAscending ? "red" : "green"}
+              style={{ marginLeft: 5 }}
+            />
+          </TouchableOpacity>
           <DataTable.Title>Actions</DataTable.Title>
         </DataTable.Header>
         {locations.map((location) => (
