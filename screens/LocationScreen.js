@@ -5,6 +5,41 @@ import { MaterialCommunityIcons } from "react-native-vector-icons";
 import { ref, push, update, remove, onValue } from "firebase/database";
 import { database } from "../config/firebaseConfig";
 
+const LocationTable = ({locations, toggleSortOrder, sortAscending, handleEdit, handleDelete}) => (
+  <DataTable>
+        <DataTable.Header>
+          <TouchableOpacity
+            onPress={toggleSortOrder}
+            style={{ flexDirection: "row", alignItems: "center", flex: 1 }}
+          >
+            <DataTable.Title>Location Name</DataTable.Title>
+            <MaterialCommunityIcons
+              name={sortAscending ? "arrow-up" : "arrow-down"}
+              size={20}
+              color={sortAscending ? "red" : "green"}
+              style={{ marginLeft: 5 }}
+            />
+          </TouchableOpacity>
+          <DataTable.Title>Actions</DataTable.Title>
+        </DataTable.Header>
+        {locations.map((location) => (
+          <DataTable.Row key={location.id}>
+            <DataTable.Cell>{location.name}</DataTable.Cell>
+            <DataTable.Cell>
+              <TouchableOpacity
+                onPress={() => handleEdit(location.id, location.name)}
+              >
+                <Text style={{ color: "blue", marginRight: 10 }}>Edit</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => handleDelete(location.id)}>
+                <Text style={{ color: "red" }}>Delete</Text>
+              </TouchableOpacity>
+            </DataTable.Cell>
+          </DataTable.Row>
+        ))}
+      </DataTable>
+)
+
 const LocationScreen = () => {
   const [locations, setLocations] = useState([]);
   const [locationName, setLocationName] = useState("");
@@ -103,6 +138,13 @@ const LocationScreen = () => {
           </DataTable.Row>
         ))}
       </DataTable>
+      <LocationTable
+        locations={locations}
+        toggleSortOrder={toggleSortOrder}
+        sortAscending={sortAscending}
+        handleEdit={handleEdit}
+        handleDelete={handleDelete}
+        />
     </View>
   );
 };
