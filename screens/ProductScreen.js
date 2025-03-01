@@ -119,6 +119,8 @@ const ProductEntryScreen = ({ navigation, route }) => {
 
 const ProductTableScreen = ({ navigation }) => {
   const [products, setProducts] = useState([]);
+  const [sortColumn, setSortColumn] = useState("productName");
+  const [sortAscending, setSortAscending] = useState(true);
 
   useEffect(() => {
     const productRef = ref(database, "products");
@@ -151,13 +153,49 @@ const ProductTableScreen = ({ navigation }) => {
     ]);
   };
 
+  const handleSort = (column) => {
+    setSortAscending(sortColumn === column ? !sortAscending : true);
+    setSortColumn(column);
+    setProducts(
+      [...products].sort((a, b) => {
+        if (a[column] < b[column]) return sortAscending ? -1 : 1;
+        if (a[column] > b[column]) return sortAscending ? 1 : -1;
+        return 0;
+      })
+    );
+  };
+
   return (
     <View style={styles.container}>
       <DataTable>
         <DataTable.Header>
-          <DataTable.Title>Product Name</DataTable.Title>
-          <DataTable.Title>Quantity</DataTable.Title>
-          <DataTable.Title>Price</DataTable.Title>
+          <DataTable.Title onPress={() => handleSort("productName")}>
+            Product Name{" "}
+            {sortColumn == "productName" && (
+              <MaterialCommunityIcons
+                name={sortAscending ? "arrow-up" : "arrow-down"}
+                size={16}
+              />
+            )}
+          </DataTable.Title>
+          <DataTable.Title onPress={() => handleSort("quantity")}>
+            Quantity{" "}
+            {sortColumn == "quantity" && (
+              <MaterialCommunityIcons
+                name={sortAscending ? "arrow-up" : "arrow-down"}
+                size={16}
+              />
+            )}
+          </DataTable.Title>
+          <DataTable.Title onPress={() => handleSort("price")}>
+            Price{" "}
+            {sortColumn == "price" && (
+              <MaterialCommunityIcons
+                name={sortAscending ? "arrow-up" : "arrow-down"}
+                size={16}
+              />
+            )}
+          </DataTable.Title>
           <DataTable.Title>Unit</DataTable.Title>
           <DataTable.Title>Actions</DataTable.Title>
         </DataTable.Header>
@@ -206,7 +244,7 @@ const styles = StyleSheet.create({
   buttonText: { color: "white", fontSize: 16, fontWeight: "bold" },
 });
 
-export default function ProductStack() {
+export default function ProductScreen() {
   return (
     <Stack.Navigator>
       <Stack.Screen
