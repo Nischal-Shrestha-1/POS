@@ -8,6 +8,8 @@ import LoginScreen from "./screens/LoginScreen";
 import SignupScreen from "./screens/SignupScreen";
 import DashboardScreen from "./screens/DashboardScreen";
 import ProductScreen from "./screens/ProductScreen";
+import VendorScreen from "./screens/CustomerScreen";
+import CustomerScreen from "./screens/VendorScreen";
 import LocationScreen from "./screens/LocationScreen";
 import SettingsScreen from "./screens/SettingsScreen";
 import { auth } from "./config/firebaseConfig";
@@ -34,6 +36,28 @@ const DrawerStack = () => {
         options={{
           drawerIcon: ({ color }) => (
             <MaterialCommunityIcons name="package" size={24} color={color} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="Vendor"
+        component={VendorScreen}
+        options={{
+          drawerIcon: ({ color }) => (
+            <MaterialCommunityIcons name="truck-fast" size={24} color={color} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="Customer"
+        component={CustomerScreen}
+        options={{
+          drawerIcon: ({ color }) => (
+            <MaterialCommunityIcons
+              name="human-dolly"
+              size={24}
+              color={color}
+            />
           ),
         }}
       />
