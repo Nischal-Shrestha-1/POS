@@ -8,11 +8,11 @@ import {
   StyleSheet,
 } from "react-native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { NavigationContainer } from "@react-navigation/native";
 import { DataTable } from "react-native-paper";
 import { MaterialCommunityIcons } from "react-native-vector-icons";
 import { ref, push, update, remove, onValue } from "firebase/database";
 import { database } from "../config/firebaseConfig";
+import { ScrollView } from "react-native-gesture-handler";
 
 const Stack = createStackNavigator();
 
@@ -166,62 +166,64 @@ const ProductTableScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <DataTable>
-        <DataTable.Header>
-          <DataTable.Title onPress={() => handleSort("productName")}>
-            Product Name{" "}
-            {sortColumn == "productName" && (
-              <MaterialCommunityIcons
-                name={sortAscending ? "arrow-up" : "arrow-down"}
-                size={16}
-              />
-            )}
-          </DataTable.Title>
-          <DataTable.Title onPress={() => handleSort("quantity")}>
-            Quantity{" "}
-            {sortColumn == "quantity" && (
-              <MaterialCommunityIcons
-                name={sortAscending ? "arrow-up" : "arrow-down"}
-                size={16}
-              />
-            )}
-          </DataTable.Title>
-          <DataTable.Title onPress={() => handleSort("price")}>
-            Price{" "}
-            {sortColumn == "price" && (
-              <MaterialCommunityIcons
-                name={sortAscending ? "arrow-up" : "arrow-down"}
-                size={16}
-              />
-            )}
-          </DataTable.Title>
-          <DataTable.Title>Unit</DataTable.Title>
-          <DataTable.Title>Actions</DataTable.Title>
-        </DataTable.Header>
-        {products.map((product) => (
-          <DataTable.Row key={product.id}>
-            <DataTable.Cell>{product.productName}</DataTable.Cell>
-            <DataTable.Cell>{product.quantity}</DataTable.Cell>
-            <DataTable.Cell>{product.price}</DataTable.Cell>
-            <DataTable.Cell>{product.unit}</DataTable.Cell>
-            <DataTable.Cell style={{ flexDirection: "row" }}>
-              <TouchableOpacity onPress={() => handleEdit(product)}>
+    <ScrollView horizontal={true}>
+      <View style={styles.container}>
+        <DataTable style={{ minWidth: 400 }}>
+          <DataTable.Header>
+            <DataTable.Title onPress={() => handleSort("productName")}>
+              Product Name{" "}
+              {sortColumn == "productName" && (
                 <MaterialCommunityIcons
-                  name="pencil"
-                  size={20}
-                  color="blue"
-                  style={{ marginRight: 10 }}
+                  name={sortAscending ? "arrow-up" : "arrow-down"}
+                  size={16}
                 />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleDelete(product.id)}>
-                <MaterialCommunityIcons name="delete" size={20} color="red" />
-              </TouchableOpacity>
-            </DataTable.Cell>
-          </DataTable.Row>
-        ))}
-      </DataTable>
-    </View>
+              )}
+            </DataTable.Title>
+            <DataTable.Title onPress={() => handleSort("quantity")}>
+              Quantity{" "}
+              {sortColumn == "quantity" && (
+                <MaterialCommunityIcons
+                  name={sortAscending ? "arrow-up" : "arrow-down"}
+                  size={16}
+                />
+              )}
+            </DataTable.Title>
+            <DataTable.Title onPress={() => handleSort("price")}>
+              Price{" "}
+              {sortColumn == "price" && (
+                <MaterialCommunityIcons
+                  name={sortAscending ? "arrow-up" : "arrow-down"}
+                  size={16}
+                />
+              )}
+            </DataTable.Title>
+            <DataTable.Title>Unit</DataTable.Title>
+            <DataTable.Title>Actions</DataTable.Title>
+          </DataTable.Header>
+          {products.map((product) => (
+            <DataTable.Row key={product.id}>
+              <DataTable.Cell>{product.productName}</DataTable.Cell>
+              <DataTable.Cell>{product.quantity}</DataTable.Cell>
+              <DataTable.Cell>{product.price}</DataTable.Cell>
+              <DataTable.Cell>{product.unit}</DataTable.Cell>
+              <DataTable.Cell style={{ flexDirection: "row" }}>
+                <TouchableOpacity onPress={() => handleEdit(product)}>
+                  <MaterialCommunityIcons
+                    name="pencil"
+                    size={20}
+                    color="blue"
+                    style={{ marginRight: 10 }}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleDelete(product.id)}>
+                  <MaterialCommunityIcons name="delete" size={20} color="red" />
+                </TouchableOpacity>
+              </DataTable.Cell>
+            </DataTable.Row>
+          ))}
+        </DataTable>
+      </View>
+    </ScrollView>
   );
 };
 
