@@ -129,6 +129,8 @@ const VendorEntryScreen = ({ navigation, route }) => {
 
 const VendorTableScreen = ({ navigation }) => {
   const [vendors, setVendors] = useState([]);
+  const [sortColumn, setSortColumn] = useState("companyName");
+  const [sortAscending, setSortAscending] = useState(true);
 
   useEffect(() => {
     const vendorRef = ref(database, "vendors");
@@ -161,14 +163,50 @@ const VendorTableScreen = ({ navigation }) => {
     ]);
   };
 
+  const handleSort = (column) => {
+    setSortAscending(sortColumn === column ? !sortAscending : true);
+    setSortColumn(column);
+    setVendors(
+      [...vendors].sort((a, b) => {
+        if (a[column] < b[column]) return sortAscending ? -1 : 1;
+        if (a[column] > b[column]) return sortAscending ? 1 : -1;
+        return 0;
+      })
+    );
+  };
+
   return (
     <ScrollView horizontal={true}>
       <View style={styles.container}>
         <DataTable style={{ minWidth: 400 }}>
           <DataTable.Header>
-            <DataTable.Title>Company Name</DataTable.Title>
-            <DataTable.Title>Contact Number</DataTable.Title>
-            <DataTable.Title>Contract Expiry</DataTable.Title>
+            <DataTable.Title onPress={() => handleSort("companyName")}>
+              Company Name{" "}
+              {sortColumn == "companyName" && (
+                <MaterialCommunityIcons
+                  name={sortAscending ? "arrow-up" : "arrow-down"}
+                  size={16}
+                />
+              )}
+            </DataTable.Title>
+            <DataTable.Title onPress={() => handleSort("contactNumber")}>
+              Contact Number{" "}
+              {sortColumn == "contactNumber" && (
+                <MaterialCommunityIcons
+                  name={sortAscending ? "arrow-up" : "arrow-down"}
+                  size={16}
+                />
+              )}
+            </DataTable.Title>
+            <DataTable.Title onPress={() => handleSort("contractExpiry")}>
+              Contract Expiry{" "}
+              {sortColumn == "contractExpiry" && (
+                <MaterialCommunityIcons
+                  name={sortAscending ? "arrow-up" : "arrow-down"}
+                  size={16}
+                />
+              )}
+            </DataTable.Title>
             <DataTable.Title>Actions</DataTable.Title>
           </DataTable.Header>
           {vendors.map((vendor) => (
