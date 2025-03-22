@@ -14,6 +14,8 @@ import LocationScreen from "./screens/LocationScreen";
 import SettingsScreen from "./screens/SettingsScreen";
 import { auth } from "./config/firebaseConfig";
 import LogoutScreen from "./screens/LogoutScreen";
+import PurchaseScreen from "./screens/PurchaseScreen";
+import SellScreen from "./screens/SellScreen";
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -44,7 +46,7 @@ const DrawerStack = () => {
         component={VendorScreen}
         options={{
           drawerIcon: ({ color }) => (
-            <MaterialCommunityIcons name="truck-fast" size={24} color={color} />
+            <MaterialCommunityIcons name="shopping" size={24} color={color} />
           ),
         }}
       />
@@ -58,6 +60,24 @@ const DrawerStack = () => {
               size={24}
               color={color}
             />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="Purchase"
+        component={PurchaseScreen}
+        options={{
+          drawerIcon: ({ color }) => (
+            <MaterialCommunityIcons name="truck-fast" size={24} color={color} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="Sell"
+        component={SellScreen}
+        options={{
+          drawerIcon: ({ color }) => (
+            <MaterialCommunityIcons name="cash" size={24} color={color} />
           ),
         }}
       />
