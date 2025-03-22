@@ -7,14 +7,18 @@ import {
   Alert,
   StyleSheet,
 } from "react-native";
-import { ref, push, onValue } from "firebase/database";
-import { database } from "../config/firebaseConfig";
 import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { ref, push, onValue, remove, update } from "firebase/database";
+import { database } from "../config/firebaseConfig";
+import { DataTable } from "react-native-paper";
+import { MaterialCommunityIcons } from "react-native-vector-icons";
+import { ScrollView } from "react-native-gesture-handler";
 
 const SellScreen = () => {
   const [customers, setCustomers] = useState([]);
   const [products, setProducts] = useState([]);
+  const [sales, setSales] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState("");
   const [selectedProduct, setSelectedProduct] = useState("");
   const [quantity, setQuantity] = useState("");
@@ -22,6 +26,7 @@ const SellScreen = () => {
   const [totalPrice, setTotalPrice] = useState(0);
   const [soldDate, setSoldDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [editSale, setEditSale] = useState(null); // To store the sale being edited
 
   useEffect(() => {
     const customerRef = ref(database, "customers");
@@ -48,7 +53,77 @@ const SellScreen = () => {
         setProducts(productArray);
       }
     });
+
+    const salesRef = ref(database, "sales");
+    onValue(salesRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const salesArray = Object.keys(data).map((key) => ({
+          id: key,
+          ...data[key],
+        }));
+        setSales(salesArray);
+      }
+    });
   }, []);
+
+  const handleSale = () => {
+    if (!selectedCustomer || !selectedProduct || !quantity) {
+      Alert.alert("Error", "Please fill all fields!");
+      return;
+    }
+
+    if (editSale) {
+      // Update the existing sale
+      update(ref(database, `sales/${editSale.id}`), {
+        customer: selectedCustomer,
+        product: selectedProduct,
+        quantity,
+        price,
+        totalPrice,
+        soldDate: soldDate.toISOString().split("T")[0],
+      })
+        .then(() => {
+          Alert.alert("Success", "Sale updated successfully!");
+          resetForm();
+        })
+        .catch((error) => Alert.alert("Error", error.message));
+    } else {
+      // Create a new sale
+      push(ref(database, "sales"), {
+        customer: selectedCustomer,
+        product: selectedProduct,
+        quantity,
+        price,
+        totalPrice,
+        soldDate: soldDate.toISOString().split("T")[0],
+      })
+        .then(() => {
+          Alert.alert("Success", "Sale recorded successfully!");
+          resetForm();
+        })
+        .catch((error) => Alert.alert("Error", error.message));
+    }
+  };
+
+  const handleDeleteSale = (saleId) => {
+    remove(ref(database, `sales/${saleId}`))
+      .then(() => {
+        setSales(sales.filter((sale) => sale.id !== saleId));
+        Alert.alert("Success", "Sale deleted successfully!");
+      })
+      .catch((error) => Alert.alert("Error", error.message));
+  };
+
+  const handleEditSale = (sale) => {
+    setEditSale(sale);
+    setSelectedCustomer(sale.customer);
+    setSelectedProduct(sale.product);
+    setQuantity(sale.quantity);
+    setPrice(sale.price);
+    setTotalPrice(sale.totalPrice);
+    setSoldDate(new Date(sale.soldDate));
+  };
 
   const handleQuantityChange = (qty) => {
     setQuantity(qty);
@@ -59,28 +134,14 @@ const SellScreen = () => {
     }
   };
 
-  const handleSale = () => {
-    if (!selectedCustomer || !selectedProduct || !quantity) {
-      Alert.alert("Error", "Please fill all fields!");
-      return;
-    }
-
-    push(ref(database, "sales"), {
-      customer: selectedCustomer,
-      product: selectedProduct,
-      quantity,
-      price,
-      totalPrice,
-      soldDate: soldDate.toISOString().split("T")[0],
-    });
-
+  const resetForm = () => {
+    setEditSale(null);
     setSelectedCustomer("");
     setSelectedProduct("");
     setQuantity("");
     setPrice("");
     setTotalPrice(0);
     setSoldDate(new Date());
-    Alert.alert("Success", "Sale recorded successfully!");
   };
 
   return (
@@ -127,7 +188,6 @@ const SellScreen = () => {
       />
 
       <Text style={styles.label}>Price: {price}</Text>
-
       <Text style={styles.label}>Total Price: {totalPrice}</Text>
 
       <Text style={styles.label}>Sold Date:</Text>
@@ -150,8 +210,74 @@ const SellScreen = () => {
       )}
 
       <TouchableOpacity style={styles.button} onPress={handleSale}>
-        <Text style={styles.buttonText}>Save Sale</Text>
+        <Text style={styles.buttonText}>
+          {editSale ? "Update Sale" : "Save Sale"}
+        </Text>
       </TouchableOpacity>
+
+      <Text style={styles.label}>Sales Details:</Text>
+      <ScrollView horizontal={true}>
+        <DataTable>
+          <DataTable.Header style={styles.tableHeader}>
+            <DataTable.Title>Customer</DataTable.Title>
+            <DataTable.Title>Product</DataTable.Title>
+            <DataTable.Title>Quantity</DataTable.Title>
+            <DataTable.Title>Total Price</DataTable.Title>
+            <DataTable.Title>Sold Date</DataTable.Title>
+            <DataTable.Title>Edit</DataTable.Title>
+            <DataTable.Title>Delete</DataTable.Title>
+          </DataTable.Header>
+
+          {sales.map((sale) => {
+            const customer = customers.find(
+              (customer) => customer.id === sale.customer
+            );
+            const product = products.find(
+              (product) => product.id === sale.product
+            );
+            const customerName = customer ? customer.name : "Unknown Customer";
+            const productName = product ? product.name : "Unknown Product";
+
+            return (
+              <DataTable.Row key={sale.id}>
+                <DataTable.Cell style={styles.tableCell}>
+                  {customerName}
+                </DataTable.Cell>
+                <DataTable.Cell style={styles.tableCell}>
+                  {productName}
+                </DataTable.Cell>
+                <DataTable.Cell style={styles.tableCell}>
+                  {sale.quantity}
+                </DataTable.Cell>
+                <DataTable.Cell style={styles.tableCell}>
+                  {sale.totalPrice}
+                </DataTable.Cell>
+                <DataTable.Cell style={styles.tableCell}>
+                  {new Date(sale.soldDate).toDateString()}
+                </DataTable.Cell>
+                <DataTable.Cell style={styles.tableCell}>
+                  <TouchableOpacity onPress={() => handleEditSale(sale)}>
+                    <MaterialCommunityIcons
+                      name="pencil-outline"
+                      size={24}
+                      color="blue"
+                    />
+                  </TouchableOpacity>
+                </DataTable.Cell>
+                <DataTable.Cell style={styles.tableCell}>
+                  <TouchableOpacity onPress={() => handleDeleteSale(sale.id)}>
+                    <MaterialCommunityIcons
+                      name="delete-outline"
+                      size={24}
+                      color="red"
+                    />
+                  </TouchableOpacity>
+                </DataTable.Cell>
+              </DataTable.Row>
+            );
+          })}
+        </DataTable>
+      </ScrollView>
     </View>
   );
 };
@@ -191,6 +317,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttonText: { color: "white", fontSize: 16, fontWeight: "bold" },
+  tableHeader: {
+    paddingHorizontal: 30,
+    paddingVertical: 12,
+  },
+  tableCell: {
+    paddingHorizontal: 30,
+    paddingVertical: 12,
+  },
 });
 
 export default SellScreen;
