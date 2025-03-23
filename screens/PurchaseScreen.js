@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Alert,
   StyleSheet,
+  ScrollView,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -13,12 +14,13 @@ import { ref, push, onValue, remove, update } from "firebase/database";
 import { database } from "../config/firebaseConfig";
 import { DataTable } from "react-native-paper";
 import { MaterialCommunityIcons } from "react-native-vector-icons";
-import { ScrollView } from "react-native-gesture-handler";
 
 const PurchaseScreen = ({ navigation }) => {
   const [vendors, setVendors] = useState([]);
   const [products, setProducts] = useState([]);
   const [purchases, setPurchases] = useState([]);
+  const [filteredPurchases, setFilteredPurchases] = useState([]);
+  const [searchText, setSearchText] = useState("");
   const [selectedVendor, setSelectedVendor] = useState("");
   const [selectedProduct, setSelectedProduct] = useState("");
   const [quantity, setQuantity] = useState("");
@@ -60,9 +62,21 @@ const PurchaseScreen = ({ navigation }) => {
           ...data[key],
         }));
         setPurchases(purchaseArray);
+        setFilteredPurchases(purchaseArray); // Initialize filtered purchases
       }
     });
   }, []);
+
+  const handleSearch = (text) => {
+    setSearchText(text);
+    const filtered = purchases.filter(
+      (purchase) =>
+        purchase.vendor.toLowerCase().includes(text.toLowerCase()) ||
+        purchase.product.toLowerCase().includes(text.toLowerCase()) ||
+        purchase.datePurchased.toLowerCase().includes(text.toLowerCase())
+    );
+    setFilteredPurchases(filtered);
+  };
 
   const handleSavePurchase = () => {
     if (!selectedVendor || !selectedProduct || !quantity) {
@@ -70,14 +84,15 @@ const PurchaseScreen = ({ navigation }) => {
       return;
     }
 
+    const purchaseData = {
+      vendor: selectedVendor,
+      product: selectedProduct,
+      quantity,
+      datePurchased: purchaseDate.toISOString().split("T")[0],
+    };
+
     if (editingPurchaseId) {
-      // If we are editing an existing purchase
-      update(ref(database, `purchases/${editingPurchaseId}`), {
-        vendor: selectedVendor,
-        product: selectedProduct,
-        quantity,
-        datePurchased: purchaseDate.toISOString().split("T")[0],
-      })
+      update(ref(database, `purchases/${editingPurchaseId}`), purchaseData)
         .then(() => {
           setEditingPurchaseId(null);
           Alert.alert("Success", "Purchase updated successfully!");
@@ -86,13 +101,7 @@ const PurchaseScreen = ({ navigation }) => {
           Alert.alert("Error", error.message);
         });
     } else {
-      // If it's a new purchase
-      push(ref(database, "purchases"), {
-        vendor: selectedVendor,
-        product: selectedProduct,
-        quantity,
-        datePurchased: purchaseDate.toISOString().split("T")[0],
-      })
+      push(ref(database, "purchases"), purchaseData)
         .then(() => {
           Alert.alert("Success", "Purchase recorded successfully!");
         })
@@ -101,19 +110,20 @@ const PurchaseScreen = ({ navigation }) => {
         });
     }
 
-    // Reset form
+    resetForm();
+  };
+
+  const resetForm = () => {
     setSelectedVendor("");
     setSelectedProduct("");
     setQuantity("");
     setPurchaseDate(new Date());
+    setSearchText("");
   };
 
   const handleDeletePurchase = (purchaseId) => {
     remove(ref(database, `purchases/${purchaseId}`))
       .then(() => {
-        setPurchases(
-          purchases.filter((purchase) => purchase.id !== purchaseId)
-        );
         Alert.alert("Success", "Purchase deleted successfully!");
       })
       .catch((error) => Alert.alert("Error", error.message));
@@ -170,25 +180,6 @@ const PurchaseScreen = ({ navigation }) => {
         style={styles.input}
       />
 
-      <Text style={styles.label}>Date Purchased:</Text>
-      <TouchableOpacity
-        onPress={() => setShowDatePicker(true)}
-        style={styles.dateButton}
-      >
-        <Text style={styles.dateText}>{purchaseDate.toDateString()}</Text>
-      </TouchableOpacity>
-      {showDatePicker && (
-        <DateTimePicker
-          value={purchaseDate}
-          mode="date"
-          display="default"
-          onChange={(event, selectedDate) => {
-            setShowDatePicker(false);
-            if (selectedDate) setPurchaseDate(selectedDate);
-          }}
-        />
-      )}
-
       <TouchableOpacity style={styles.button} onPress={handleSavePurchase}>
         <Text style={styles.buttonText}>
           {editingPurchaseId ? "Update Purchase" : "Save Purchase"}
@@ -196,18 +187,26 @@ const PurchaseScreen = ({ navigation }) => {
       </TouchableOpacity>
 
       <Text style={styles.label}>Purchase Details:</Text>
+
+      <Text style={styles.label}>Search Purchases:</Text>
+      <TextInput
+        placeholder="Search by vendor, product, or date"
+        value={searchText}
+        onChangeText={handleSearch}
+        style={styles.searchInput}
+      />
       <ScrollView horizontal={true}>
         <DataTable>
           <DataTable.Header style={styles.tableHeader}>
             <DataTable.Title>Vendor</DataTable.Title>
             <DataTable.Title>Product</DataTable.Title>
             <DataTable.Title>Quantity</DataTable.Title>
-            <DataTable.Title>Date Purchased</DataTable.Title>
+            <DataTable.Title>Date</DataTable.Title>
             <DataTable.Title>Edit</DataTable.Title>
             <DataTable.Title>Delete</DataTable.Title>
           </DataTable.Header>
 
-          {purchases.map((purchase) => (
+          {filteredPurchases.map((purchase) => (
             <DataTable.Row key={purchase.id}>
               <DataTable.Cell style={styles.tableCell}>
                 {purchase.vendor}
@@ -219,9 +218,9 @@ const PurchaseScreen = ({ navigation }) => {
                 {purchase.quantity}
               </DataTable.Cell>
               <DataTable.Cell style={styles.tableCell}>
-                {new Date(purchase.datePurchased).toDateString()}
+                {purchase.datePurchased}
               </DataTable.Cell>
-              <DataTable.Cell style={styles.tableCell}>
+              <DataTable.Cell>
                 <TouchableOpacity onPress={() => handleEditPurchase(purchase)}>
                   <MaterialCommunityIcons
                     name="pencil-outline"
@@ -252,38 +251,21 @@ const PurchaseScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: { padding: 20 },
   label: { fontSize: 16, marginBottom: 5 },
-  picker: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    marginBottom: 10,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-  },
-  input: {
+  searchInput: {
     borderWidth: 1,
     padding: 10,
     marginBottom: 10,
     borderRadius: 5,
   },
-  dateButton: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 10,
-    marginBottom: 10,
-    borderRadius: 5,
-    alignItems: "center",
-  },
-  dateText: {
-    fontSize: 16,
-    color: "#000",
-  },
+  picker: { borderWidth: 1, marginBottom: 10, borderRadius: 5 },
+  input: { borderWidth: 1, padding: 10, marginBottom: 10, borderRadius: 5 },
   button: {
     backgroundColor: "#6200ee",
     padding: 12,
     borderRadius: 5,
     alignItems: "center",
   },
-  buttonText: { color: "white", fontSize: 16, fontWeight: "bold" },
+  buttonText: { color: "white", fontSize: 16 },
   tableHeader: { paddingHorizontal: 30, paddingVertical: 12 },
   tableCell: { paddingHorizontal: 30, paddingVertical: 12 },
 });
