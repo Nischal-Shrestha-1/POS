@@ -74,7 +74,6 @@ const SellScreen = () => {
     }
 
     if (editSale) {
-      // Update the existing sale
       update(ref(database, `sales/${editSale.id}`), {
         customer: selectedCustomer,
         product: selectedProduct,
@@ -89,7 +88,6 @@ const SellScreen = () => {
         })
         .catch((error) => Alert.alert("Error", error.message));
     } else {
-      // Create a new sale
       push(ref(database, "sales"), {
         customer: selectedCustomer,
         product: selectedProduct,
