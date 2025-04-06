@@ -16,6 +16,7 @@ import { auth } from "./config/firebaseConfig";
 import LogoutScreen from "./screens/LogoutScreen";
 import PurchaseScreen from "./screens/PurchaseScreen";
 import SellScreen from "./screens/SellScreen";
+import SellBulkScreen from "./screens/SellBulkScreen";
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -73,8 +74,21 @@ const DrawerStack = () => {
         }}
       />
       <Drawer.Screen
-        name="Sell"
+        name="POS"
         component={SellScreen}
+        options={{
+          drawerIcon: ({ color }) => (
+            <MaterialCommunityIcons
+              name="cash-register"
+              size={24}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="Sell"
+        component={SellBulkScreen}
         options={{
           drawerIcon: ({ color }) => (
             <MaterialCommunityIcons name="cash" size={24} color={color} />
