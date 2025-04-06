@@ -119,6 +119,8 @@ const ProductEntryScreen = ({ navigation, route }) => {
 
 const ProductTableScreen = ({ navigation }) => {
   const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [sortColumn, setSortColumn] = useState("productName");
   const [sortAscending, setSortAscending] = useState(true);
 
@@ -132,11 +134,20 @@ const ProductTableScreen = ({ navigation }) => {
           ...data[key],
         }));
         setProducts(productArray);
+        setFilteredProducts(productArray);
       } else {
         setProducts([]);
+        setFilteredProducts([]);
       }
     });
   }, []);
+
+  useEffect(() => {
+    const filtered = products.filter((p) =>
+      p.productName.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredProducts(filtered);
+  }, [searchQuery, products]);
 
   const handleEdit = (product) => {
     navigation.navigate("ProductEntry", { product });
@@ -154,20 +165,35 @@ const ProductTableScreen = ({ navigation }) => {
   };
 
   const handleSort = (column) => {
-    setSortAscending(sortColumn === column ? !sortAscending : true);
+    const ascending = sortColumn === column ? !sortAscending : true;
+    setSortAscending(ascending);
     setSortColumn(column);
-    setProducts(
-      [...products].sort((a, b) => {
-        if (a[column] < b[column]) return sortAscending ? -1 : 1;
-        if (a[column] > b[column]) return sortAscending ? 1 : -1;
-        return 0;
-      })
-    );
+
+    const sorted = [...filteredProducts].sort((a, b) => {
+      if (a[column] < b[column]) return ascending ? -1 : 1;
+      if (a[column] > b[column]) return ascending ? 1 : -1;
+      return 0;
+    });
+
+    setFilteredProducts(sorted);
   };
 
   return (
     <ScrollView horizontal={true}>
       <View style={styles.container}>
+        <TextInput
+          placeholder="Search by product name"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          style={{
+            borderWidth: 1,
+            borderColor: "#ccc",
+            padding: 10,
+            borderRadius: 5,
+            marginBottom: 15,
+            width: 300,
+          }}
+        />
         <DataTable style={{ minWidth: 400 }}>
           <DataTable.Header>
             <DataTable.Title onPress={() => handleSort("productName")}>
@@ -200,7 +226,7 @@ const ProductTableScreen = ({ navigation }) => {
             <DataTable.Title>Unit</DataTable.Title>
             <DataTable.Title>Actions</DataTable.Title>
           </DataTable.Header>
-          {products.map((product) => (
+          {filteredProducts.map((product) => (
             <DataTable.Row key={product.id}>
               <DataTable.Cell>{product.productName}</DataTable.Cell>
               <DataTable.Cell>{product.quantity}</DataTable.Cell>
