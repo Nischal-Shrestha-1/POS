@@ -26,7 +26,7 @@ const SellScreen = () => {
   const [totalPrice, setTotalPrice] = useState(0);
   const [soldDate, setSoldDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [editSale, setEditSale] = useState(null); // To store the sale being edited
+  const [editSale, setEditSale] = useState(null);
 
   useEffect(() => {
     const customerRef = ref(database, "customers");
@@ -67,6 +67,26 @@ const SellScreen = () => {
     });
   }, []);
 
+  const handleEditSale = (sale) => {
+    setEditSale(sale);
+    setSelectedCustomer(sale.customer);
+    setSelectedProduct(sale.product);
+    setQuantity(sale.quantity);
+    setPrice(sale.price);
+    setTotalPrice(sale.totalPrice);
+    setSoldDate(new Date(sale.soldDate));
+  };
+
+  const handleDeleteSale = (saleId) => {
+    remove(ref(database, `sales/${saleId}`))
+      .then(() => {
+        setSales(sales.filter((sale) => sale.id !== saleId));
+        Alert.alert("Success", "Sale deleted successfully!");
+      })
+      .catch((error) => Alert.alert("Error", error.message));
+  };
+
+
   const handleSale = () => {
     if (!selectedCustomer || !selectedProduct || !quantity) {
       Alert.alert("Error", "Please fill all fields!");
@@ -102,25 +122,6 @@ const SellScreen = () => {
         })
         .catch((error) => Alert.alert("Error", error.message));
     }
-  };
-
-  const handleDeleteSale = (saleId) => {
-    remove(ref(database, `sales/${saleId}`))
-      .then(() => {
-        setSales(sales.filter((sale) => sale.id !== saleId));
-        Alert.alert("Success", "Sale deleted successfully!");
-      })
-      .catch((error) => Alert.alert("Error", error.message));
-  };
-
-  const handleEditSale = (sale) => {
-    setEditSale(sale);
-    setSelectedCustomer(sale.customer);
-    setSelectedProduct(sale.product);
-    setQuantity(sale.quantity);
-    setPrice(sale.price);
-    setTotalPrice(sale.totalPrice);
-    setSoldDate(new Date(sale.soldDate));
   };
 
   const handleQuantityChange = (qty) => {
